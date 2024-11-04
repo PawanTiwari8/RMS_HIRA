@@ -28,6 +28,21 @@ const AddProjectModal = ({ isOpen, onClose , project, isEditing}) => {
     onClose()
   };
 
+  const handlehourCalculation = (index , e) => {
+    let input = e;
+    const validDecimal = /^$|^\d+(\.\d{0,2})?$/;
+    if (validDecimal.test(input)) {
+      const [hours, minutes] = input.split('.');
+      if (!minutes || parseInt(minutes) <= 59) {
+        handleHoursChange(index,input); 
+      } else {
+        alert("Minutes should not exceed 59.");
+      }
+    } else {
+      alert("Please enter a valid hour format with up to two decimal places.");
+    }
+  }; 
+
   const handleRemoveEmployee = (index) => {
     const updatedEmployees = selectedEmployees.filter((_, i) => i !== index);
     setSelectedEmployees(updatedEmployees);
@@ -55,10 +70,14 @@ const AddProjectModal = ({ isOpen, onClose , project, isEditing}) => {
   const calculateRevenue = (initialBudget, selectedEmployees) => {
    
     const totalExpenditure = selectedEmployees.reduce((total, emp) => {
-      const hoursWorked = parseFloat(emp.hoursWorked) || 0;
-      return total + emp.salaryRate * hoursWorked;
+      const [hours, minutes] = emp.hoursWorked.split('.');
+      const hourValue = parseInt(hours || 0, 10);
+      const minuteValue = parseInt(minutes || 0, 10);
+      const hoursWorked = (hourValue * 60) + minuteValue ; 
+      const totalHoursWorked = parseFloat((emp.salaryRate * hoursWorked)/60);
+      return total + totalHoursWorked;
     }, 0);
-    console.log(totalExpenditure)
+    
     return parseFloat(initialBudget) - totalExpenditure;
   };
 
@@ -155,7 +174,7 @@ const AddProjectModal = ({ isOpen, onClose , project, isEditing}) => {
          placeholder=" " 
          required
          value={emp.hoursWorked}
-         onChange={(e) => handleHoursChange(index, e.target.value)}
+         onChange={(e) => handlehourCalculation(index, e.target.value)}
          />
         <label for="Initial_Budget"  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Hours Worked</label>
         </div>
