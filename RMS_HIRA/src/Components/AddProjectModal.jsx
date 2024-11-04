@@ -29,7 +29,7 @@ const AddProjectModal = ({ isOpen, onClose , project, isEditing}) => {
   };
 
   const handlehourCalculation = (index , e) => {
-    let input = e;
+    let input = e.toString();
     const validDecimal = /^$|^\d+(\.\d{0,2})?$/;
     if (validDecimal.test(input)) {
       const [hours, minutes] = input.split('.');
@@ -61,19 +61,25 @@ const AddProjectModal = ({ isOpen, onClose , project, isEditing}) => {
   };
 
   const handleHoursChange = (index, hours) => {
+    console.log(typeof(hours))
     const updatedEmployees = selectedEmployees.map((emp, i) =>
-      i === index ? { ...emp, hoursWorked: hours } : emp
+      i === index ? { ...emp, hoursWorked: hours} : emp
     );
     setSelectedEmployees(updatedEmployees);
+    // console.log(selectedEmployees)
   };
 
   const calculateRevenue = (initialBudget, selectedEmployees) => {
    
     const totalExpenditure = selectedEmployees.reduce((total, emp) => {
-      const [hours, minutes] = emp.hoursWorked.split('.');
+      
+      const StringhoursWorked = emp.hoursWorked ? emp.hoursWorked.toString() : "0.00";
+      
+      const [hours, minutes] = StringhoursWorked.split('.');
       const hourValue = parseInt(hours || 0, 10);
       const minuteValue = parseInt(minutes || 0, 10);
       const hoursWorked = (hourValue * 60) + minuteValue ; 
+      // console.log(hoursWorked)
       const totalHoursWorked = parseFloat((emp.salaryRate * hoursWorked)/60);
       return total + totalHoursWorked;
     }, 0);
@@ -92,7 +98,7 @@ const AddProjectModal = ({ isOpen, onClose , project, isEditing}) => {
         name: emp.name,
         role: emp.role,
         salaryRate: emp.salaryRate,
-        hoursWorked: parseFloat(emp.hoursWorked),
+        hoursWorked: emp.hoursWorked,
       })),
       revenue: calculateRevenue(initialBudget, selectedEmployees),
     };
